@@ -1,0 +1,14 @@
+[
+  {
+    "name": "/promote requires a replied-to group member",
+    "steps": [
+      { "send": { "text": "/promote" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Reply to a member’s message with /promote to make them a moderator." } }] }
+    ]
+  },
+  {
+    "name": "/demote requires a replied-to moderator",
+    "steps": [
+      { "send": { "text": "/demote" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Reply to a moderator’s message with /demote." } }] }
+    ]
+  }
+]

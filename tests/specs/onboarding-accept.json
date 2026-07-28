@@ -5,10 +5,8 @@
       {
         "expect": [
           {
-            "method": "sendMessage",
-            "payload": {
-              "text": "Complete onboarding flow"
-            }
+            "method": "editMessageText",
+            "payload": { "text": "Rules approved. You can participate now." }
           }
         ],
         "send": {

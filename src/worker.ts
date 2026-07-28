@@ -14,6 +14,7 @@ import { webhookCallback, Composer, type Bot } from "grammy";
 import { buildBot, type Ctx } from "./bot.js";
 import { handlers } from "./handlers.generated.js";
 import { createDurableSessionStorage, type WorkerEnv } from "./toolkit/session/durable.js";
+import { configureDomainStorage } from "./group-data.js";
 
 export { ChatDO } from "./toolkit/session/durable.js";
 
@@ -30,6 +31,11 @@ let botPromise: Promise<Bot<Ctx>> | null = null;
 function getBot(env: WorkerEnv): Promise<Bot<Ctx>> {
   if (!botPromise) {
     botPromise = (async () => {
+      // Domain records share the same Durable-Object-backed adapter as session
+      // state, but use separate namespaced keys and explicit indexes.
+      const domainStorage = createDurableSessionStorage<Record<string, unknown>>(env);
+      configureDomainStorage(domainStorage);
+      const storage = createDurableSessionStorage<import("./bot.js").Session>(env);
       // Expose the runtime env to handlers (Workers-only; the harness never sets
       // it) BEFORE they run — a handler reaches bindings + helpers through it
       // (remindAt(ctx.env, …), ctx.env.DB). buildBot installs `handlers` in array
@@ -42,7 +48,7 @@ function getBot(env: WorkerEnv): Promise<Bot<Ctx>> {
       });
       const bot = await buildBot(env.BOT_TOKEN, {
         handlers: [attachEnv, ...handlers],
-        storage: createDurableSessionStorage(env),
+        storage,
         // Worker isolates are request-scoped: they do not expose secrets through
         // process.env and cannot reliably keep a five-minute interval alive.
         telemetryEnv: env,
