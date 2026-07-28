@@ -1,0 +1,20 @@
+[
+  {
+    "name": "/appeal",
+    "steps": [
+      {
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Request review of mute/ban action"
+            }
+          }
+        ],
+        "send": {
+          "text": "/appeal"
+        }
+      }
+    ]
+  }
+]
