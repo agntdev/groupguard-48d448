@@ -7,7 +7,7 @@
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Request review of mute/ban action"
+              "text": "There’s no recent moderation decision to review."
             }
           }
         ],

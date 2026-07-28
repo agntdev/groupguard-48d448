@@ -7,7 +7,7 @@
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Create polls, reminders, or announcements"
+              "text": "Choose the kind of post to schedule."
             }
           }
         ],

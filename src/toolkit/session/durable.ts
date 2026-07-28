@@ -48,7 +48,9 @@ export interface WorkerEnv {
 interface Reminder {
   at: number; // epoch ms
   chatId: number | string;
-  text: string;
+  text?: string;
+  method?: "sendMessage" | "sendPoll";
+  payload?: Record<string, unknown>;
 }
 
 /**
@@ -102,6 +104,25 @@ export async function remindAt(
     });
   } catch {
     /* best-effort: a reminder we couldn't schedule must not break the reply */
+  }
+}
+
+/** Schedule a Telegram API call in the target chat's Durable Object. */
+export async function scheduleTelegramCall(
+  env: WorkerEnv,
+  chatId: number | string,
+  whenEpochMs: number,
+  method: "sendMessage" | "sendPoll",
+  payload: Record<string, unknown>,
+): Promise<void> {
+  try {
+    const stub = env.CHAT_DO.get(env.CHAT_DO.idFromName("chat:" + chatId));
+    await stub.fetch("https://do/remind", {
+      method: "POST",
+      body: JSON.stringify({ at: whenEpochMs, chatId, method, payload } satisfies Reminder),
+    });
+  } catch {
+    // The durable record remains available for a moderator to retry later.
   }
 }
 
@@ -165,7 +186,7 @@ export class ChatDO {
     const due = list.filter((r) => r.at <= now);
     const rest = list.filter((r) => r.at > now);
     for (const r of due) {
-      await tg(this.env.BOT_TOKEN, "sendMessage", { chat_id: r.chatId, text: r.text });
+      await tg(this.env.BOT_TOKEN, r.method ?? "sendMessage", r.payload ?? { chat_id: r.chatId, text: r.text });
     }
     await this.state.storage.put("reminders", rest);
     await this.rearm(rest);

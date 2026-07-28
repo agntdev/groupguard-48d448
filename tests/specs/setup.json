@@ -7,7 +7,7 @@
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Configure moderation rules and admin roles"
+              "text": "Choose what you’d like to configure."
             }
           }
         ],

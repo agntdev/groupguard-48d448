@@ -1,0 +1,8 @@
+[
+  {
+    "name": "/cancel clears an in-progress draft",
+    "steps": [
+      { "send": { "text": "/cancel" }, "expect": [{ "method": "sendMessage", "payload": { "text": "That draft was cancelled. Nothing was changed." } }] }
+    ]
+  }
+]
